@@ -8,17 +8,17 @@ def create_app(config):
     app = Flask(__name__, static_folder='..')
     
     # 配置 CORS - 限制允许的源
-    if config.ALLOWED_ORIGINS:
-        CORS(app, resources={r"/*": {"origins": config.ALLOWED_ORIGINS}})
-    else:
-        # 开发环境警告
-        if config.DEBUG:
-            print("警告: CORS 允许所有来源（仅用于开发）")
-            CORS(app)
-        else:
-            print("错误: 生产环境必须设置 ALLOWED_ORIGINS")
-            import sys
-            sys.exit(1)
+    # if config.ALLOWED_ORIGINS:
+    #     CORS(app, resources={r"/*": {"origins": config.ALLOWED_ORIGINS}})
+    # else:
+    #     # 开发环境警告
+    #     if config.DEBUG:
+    #         print("警告: CORS 允许所有来源（仅用于开发）")
+    #         CORS(app)
+    #     else:
+    #         print("错误: 生产环境必须设置 ALLOWED_ORIGINS")
+    #         import sysquit
+    #         sys.exit(1)
     
     # 配置 SocketIO CORS
     cors_origins = config.ALLOWED_ORIGINS if config.ALLOWED_ORIGINS else "*"
