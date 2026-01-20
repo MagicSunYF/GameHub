@@ -15,10 +15,10 @@ cd server
 pip install -r requirements.txt
 ```
 
-2. 配置环境变量（可选）:
+2. 配置环境变量（必需）:
 ```bash
 cp .env.example .env
-# 编辑 .env 修改数据库配置
+# 编辑 .env 设置数据库密码和 CORS 配置
 ```
 
 3. 启动服务器:
@@ -27,6 +27,13 @@ python main.py
 ```
 
 4. 访问 http://localhost:5000 开始游戏
+
+## 安全配置
+
+生产环境部署前请阅读 `server/SECURITY.md`，确保：
+- 设置强数据库密码
+- 配置 ALLOWED_ORIGINS
+- 禁用 DEBUG 模式
 
 ## 插件开发
 
