@@ -6,7 +6,7 @@ from plugins.gomoku import GomokuPlugin
 
 def main():
     # 创建应用
-    app, socketio = create_app()
+    app, socketio = create_app(Config)
     
     # 初始化数据库
     db = Database(Config.MYSQL_CONFIG)

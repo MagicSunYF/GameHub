@@ -2,6 +2,10 @@ from flask import request, jsonify
 from flask_socketio import emit, join_room
 from datetime import datetime
 import json
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from validators import InputValidator
 
 class GomokuPlugin:
     def __init__(self, app, socketio, db, game_manager):
@@ -57,7 +61,12 @@ class GomokuPlugin:
         
         @self.socketio.on('join_room')
         def handle_join_room(data):
-            room_id = data.get('room_id')
+            try:
+                room_id = InputValidator.validate_room_id(data.get('room_id'))
+            except ValueError as e:
+                emit('error', {'msg': str(e)})
+                return
+            
             is_spectator = data.get('spectator', False)
             room = self.game_manager.get_room(room_id)
             
@@ -86,8 +95,13 @@ class GomokuPlugin:
         
         @self.socketio.on('make_move')
         def handle_move(data):
-            room_id = data.get('room_id')
-            r, c = data.get('row'), data.get('col')
+            try:
+                room_id = InputValidator.validate_room_id(data.get('room_id'))
+                r, c = InputValidator.validate_coordinates(data.get('row'), data.get('col'))
+            except (ValueError, TypeError) as e:
+                emit('error', {'msg': str(e)})
+                return
+            
             room = self.game_manager.get_room(room_id)
             
             if not room:
@@ -113,8 +127,13 @@ class GomokuPlugin:
         
         @self.socketio.on('send_comment')
         def handle_comment(data):
-            room_id = data.get('room_id')
-            comment = data.get('comment')
+            try:
+                room_id = InputValidator.validate_room_id(data.get('room_id'))
+                comment = InputValidator.sanitize_comment(data.get('comment'))
+            except ValueError as e:
+                emit('error', {'msg': str(e)})
+                return
+            
             if self.game_manager.get_room(room_id):
                 emit('new_comment', {'comment': comment}, room=room_id)
         
