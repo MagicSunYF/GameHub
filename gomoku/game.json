@@ -1,0 +1,14 @@
+{
+  "name": "五子棋",
+  "id": "gomoku",
+  "icon": "⚫⚪",
+  "description": "联机对战 · 单人模式 · 观战弹幕",
+  "entry": "index.html",
+  "version": "1.0.0",
+  "author": "Game Studio",
+  "server": {
+    "enabled": true,
+    "file": "server.py",
+    "port": 5000
+  }
+}

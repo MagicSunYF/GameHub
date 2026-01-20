@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>极速狂飙</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1 id="title">极速狂飙</h1>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="score">得分: 0</div>
+        <div id="game-over" class="hidden">
+            <div class="game-over-title">游戏结束</div>
+            <div class="game-over-score">得分: <span id="final-score">0</span></div>
+            <button onclick="restartGame()">重新开始</button>
+        </div>
+    </div>
+    <div id="controls">
+        <button onclick="startGame()">开始游戏</button>
+    </div>
+    <div id="hint">按 ESC 隐藏 | ← → 移动 | 空格 跳跃</div>
+    <script src="game.js"></script>
+</body>
+</html>

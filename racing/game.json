@@ -1,0 +1,9 @@
+{
+  "name": "极速狂飙",
+  "id": "racing",
+  "icon": "🏎️",
+  "description": "躲避障碍 · 跳跃闯关 · 挑战极限",
+  "entry": "racing.html",
+  "version": "1.0.0",
+  "author": "Game Studio"
+}

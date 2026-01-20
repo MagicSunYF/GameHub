@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小游戏集</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #f5f5f7;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #1d1d1f 0%, #000 100%);
+        }
+
+        .hero h1 {
+            font-size: 80px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+            background: linear-gradient(90deg, #f5f5f7, #86868b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 28px;
+            color: #86868b;
+            margin-bottom: 50px;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .games-nav {
+            display: flex;
+            gap: 30px;
+            margin-top: 40px;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .game-card {
+            width: 280px;
+            height: 320px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 18px;
+            padding: 40px 30px;
+            text-decoration: none;
+            color: #f5f5f7;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .game-icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+        }
+
+        .game-card h3 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .game-card p {
+            font-size: 17px;
+            color: #86868b;
+            line-height: 1.5;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .footer {
+            padding: 40px;
+            text-align: center;
+            color: #86868b;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>小游戏集</h1>
+        <p>简单、优雅、有趣</p>
+        
+        <div class="games-nav">
+            <a href="gomoku/index.html" class="game-card">
+                <div class="game-icon">⚫⚪</div>
+                <h3>五子棋</h3>
+                <p>联机对战 · 单人模式 · 观战弹幕</p>
+            </a>
+            
+            <a href="racing/index.html" class="game-card">
+                <div class="game-icon">🏎️</div>
+                <h3>极速狂飙</h3>
+                <p>躲避障碍 · 跳跃闯关 · 挑战极限</p>
+            </a>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2026 小游戏集. 按 ESC 快速隐藏游戏界面
+    </div>
+</body>
+</html>
