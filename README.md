@@ -9,13 +9,24 @@
 
 ## 快速开始
 
-1. 启动五子棋服务器（如需联机功能）:
+1. 安装依赖:
 ```bash
-cd gomoku
-python server.py
+cd server
+pip install -r requirements.txt
 ```
 
-2. 打开 `index.html` 开始游戏
+2. 配置环境变量（可选）:
+```bash
+cp .env.example .env
+# 编辑 .env 修改数据库配置
+```
+
+3. 启动服务器:
+```bash
+python main.py
+```
+
+4. 访问 http://localhost:5000 开始游戏
 
 ## 插件开发
 
