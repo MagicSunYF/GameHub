@@ -1,0 +1,14 @@
+{
+  "name": "斗地主",
+  "id": "landlord",
+  "icon": "🃏",
+  "description": "叫地主 · 抢地主 · 炸弹特效",
+  "entry": "index.html",
+  "version": "1.0.0",
+  "author": "GameHub",
+  "server": {
+    "enabled": true,
+    "file": "../server/main.py",
+    "port": 5000
+  }
+}

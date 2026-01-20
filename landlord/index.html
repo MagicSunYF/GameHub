@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>斗地主</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1 id="title">🃏 斗地主</h1>
+    <div id="hint">按 ESC 隐藏</div>
+    
+    <div id="game-container">
+        <div id="game-screen">
+            <!-- 顶部玩家 -->
+            <div id="top-player" class="player-area">
+                <div class="player-seat empty">
+                    <div class="avatar">👤</div>
+                    <div class="player-name">等待加入</div>
+                </div>
+            </div>
+
+            <!-- 中央区域 -->
+            <div id="center-area">
+                <!-- 房间信息 -->
+                <div id="room-panel">
+                    <div class="room-id-box">
+                        <span class="label">房间号</span>
+                        <span id="room-id-display">------</span>
+                    </div>
+                    <div class="menu-buttons">
+                        <button id="create-room-btn" class="menu-btn">创建房间</button>
+                        <button id="join-room-btn" class="menu-btn">加入房间</button>
+                    </div>
+                    <div id="join-input" class="hidden">
+                        <input type="text" id="room-id-input" placeholder="输入房间号" maxlength="8">
+                        <button id="join-confirm-btn" class="menu-btn small">加入</button>
+                    </div>
+                </div>
+
+                <!-- 底牌区 -->
+                <div id="landlord-cards" class="hidden">
+                    <div class="label">底牌</div>
+                    <div id="bottom-cards"></div>
+                </div>
+                
+                <!-- 叫地主区 -->
+                <div id="bid-area" class="hidden">
+                    <div class="bid-buttons">
+                        <button class="bid-btn" data-bid="0">不叫</button>
+                        <button class="bid-btn" data-bid="1">叫地主</button>
+                        <button class="bid-btn" data-bid="2">抢地主</button>
+                    </div>
+                </div>
+
+                <!-- 上家出牌 -->
+                <div id="last-play" class="hidden">
+                    <div id="last-cards"></div>
+                </div>
+            </div>
+
+            <!-- 左侧玩家 -->
+            <div id="left-player" class="player-area">
+                <div class="player-seat empty">
+                    <div class="avatar">👤</div>
+                    <div class="player-name">等待加入</div>
+                </div>
+            </div>
+
+            <!-- 右侧玩家（自己） -->
+            <div id="right-player" class="player-area">
+                <div class="player-seat ready">
+                    <div class="avatar">😊</div>
+                    <div class="player-name">我</div>
+                </div>
+            </div>
+
+            <!-- 手牌区 -->
+            <div id="my-cards">
+                <div id="hand-cards"></div>
+                <div class="action-buttons hidden">
+                    <button id="play-btn" class="action-btn">出牌</button>
+                    <button id="pass-btn" class="action-btn secondary">不出</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="effect-container"></div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
