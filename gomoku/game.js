@@ -26,11 +26,15 @@ document.addEventListener('keydown', (e) => {
             gameInfo.classList.add('hidden');
             title.classList.add('hidden');
             hint.classList.add('hidden');
+            menuPanel.classList.add('hidden');
         } else {
             gameBoard.classList.remove('hidden');
             gameInfo.classList.remove('hidden');
             title.classList.remove('hidden');
             hint.classList.remove('hidden');
+            if (!roomId && !isSinglePlayer) {
+                menuPanel.classList.remove('hidden');
+            }
         }
     }
 });
@@ -39,11 +43,13 @@ socket.on('room_created', (data) => {
     roomId = data.room_id;
     myColor = data.color;
     gameInfo.innerText = `房间号: ${roomId} (等待对手加入...)`;
+    menuPanel.classList.add('hidden');
 });
 
 socket.on('room_joined', (data) => {
     roomId = data.room_id;
     myColor = data.color;
+    menuPanel.classList.add('hidden');
 });
 
 socket.on('spectator_joined', (data) => {
@@ -57,6 +63,7 @@ socket.on('spectator_joined', (data) => {
     current = data.current;
     drawBoard();
     showInfo();
+    menuPanel.classList.add('hidden');
 });
 
 socket.on('game_start', () => {
@@ -125,15 +132,11 @@ function startSinglePlayer() {
     drawBoard();
     showInfo();
     showStartEffect();
+    menuPanel.classList.add('hidden');
 }
 
 drawBoard();
-gameInfo.innerHTML = `
-    <button onclick="startSinglePlayer()">单人模式</button>
-    <button onclick="createRoom()">创建房间</button>
-    <button onclick="joinRoom()">加入房间</button>
-    <button onclick="spectateRoom()">观战</button>
-`;
+const menuPanel = document.getElementById('menu-panel');
 
 function drawBoard() {
     gameBoard.innerHTML = '';
