@@ -298,43 +298,46 @@ body {
 
 #hand-cards {
     display: flex;
-    gap: -40px;
+    gap: 5px;
     justify-content: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 10px 0;
 }
 
 .card {
-    width: 70px;
-    height: 100px;
+    width: 50px;
+    height: 70px;
+    min-width: 50px;
     background: white;
-    border-radius: 8px;
+    border-radius: 6px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     position: relative;
     user-select: none;
 }
 
 .card:hover {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
 }
 
 .card.selected {
-    transform: translateY(-20px);
-    box-shadow: 0 8px 20px rgba(10, 132, 255, 0.5);
+    transform: translateY(-15px);
+    box-shadow: 0 6px 16px rgba(10, 132, 255, 0.5);
 }
 
 .card-value {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     font-weight: 700;
 }
 
 .card-suit {
-    font-size: 1.2rem;
+    font-size: 0.9rem;
 }
 
 .card.red {
@@ -489,7 +492,32 @@ body {
     }
     
     .card {
-        width: 60px;
-        height: 85px;
+        width: 45px;
+        height: 65px;
+        min-width: 45px;
+    }
+    
+    .card-value {
+        font-size: 1rem;
+    }
+    
+    .card-suit {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .card {
+        width: 40px;
+        height: 58px;
+        min-width: 40px;
+    }
+    
+    .card-value {
+        font-size: 0.9rem;
+    }
+    
+    .card-suit {
+        font-size: 0.7rem;
     }
 }

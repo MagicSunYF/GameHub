@@ -9,14 +9,20 @@ def main():
     # 创建应用
     app, socketio = create_app(Config)
     
-    # 初始化数据库
-    db = Database(Config.MYSQL_CONFIG)
+    # 初始化数据库（可选）
+    try:
+        db = Database(Config.MYSQL_CONFIG)
+        GomokuPlugin(app, socketio, db, game_manager)
+    except Exception as e:
+        print(f'数据库连接失败，跳过数据库功能: {e}')
+        db = None
     
     # 初始化游戏管理器
     game_manager = GameManager()
     
     # 加载游戏插件
-    GomokuPlugin(app, socketio, db, game_manager)
+    if db:
+        GomokuPlugin(app, socketio, db, game_manager)
     LandlordPlugin(app, socketio, db, game_manager)
     
     # 启动服务器

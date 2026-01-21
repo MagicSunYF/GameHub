@@ -99,7 +99,7 @@ h1.hidden {
 }
 
 #game-info {
-    margin-top: clamp(20px, 3vh, 30px);
+    margin-top: clamp(15px, 2vh, 20px);
     font-size: clamp(15px, 2vw, 18px);
     color: #f5f5f7;
     display: flex;
@@ -115,24 +115,41 @@ h1.hidden {
     pointer-events: none;
 }
 
+#menu-panel {
+    position: fixed;
+    top: clamp(20px, 3vh, 30px);
+    right: clamp(20px, 3vw, 30px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+    transition: opacity 0.3s ease;
+}
+
+#menu-panel.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
 button {
     padding: clamp(10px, 1.5vh, 12px) clamp(20px, 3vw, 28px);
-    font-size: clamp(15px, 2vw, 17px);
+    font-size: clamp(14px, 1.8vw, 16px);
     font-weight: 500;
     cursor: pointer;
     background: rgba(255,255,255,0.1);
     color: #f5f5f7;
     border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 980px;
+    border-radius: 10px;
     transition: all 0.2s ease;
     font-family: inherit;
     backdrop-filter: blur(10px);
+    white-space: nowrap;
 }
 
 button:hover {
     background: rgba(255,255,255,0.15);
     border-color: rgba(255,255,255,0.3);
-    transform: scale(1.02);
+    transform: translateX(-3px);
 }
 
 button:active {

@@ -7,6 +7,9 @@ let selectedCards = [];
 let isLandlord = false;
 let currentTurn = null;
 let gameStarted = false;
+let isSingleMode = false;
+let aiCards = { left: [], top: [] };
+let lastPlayPosition = null;
 
 // 牌型定义
 const CARD_VALUES = {
@@ -27,6 +30,11 @@ document.addEventListener('keydown', (e) => {
 });
 
 // 菜单事件
+document.getElementById('single-mode-btn').addEventListener('click', () => {
+    isSingleMode = true;
+    startSingleMode();
+});
+
 document.getElementById('create-room-btn').addEventListener('click', () => {
     socket.emit('create_room', { game: 'landlord' });
 });
@@ -185,24 +193,62 @@ document.getElementById('play-btn').addEventListener('click', () => {
         return;
     }
     
-    socket.emit('play_cards', { room_id: roomId, cards: selectedCards });
-    
-    // 移除已出的牌
-    selectedCards.forEach(card => {
-        const index = myCards.findIndex(c => c.value === card.value && c.suit === card.suit);
-        if (index > -1) myCards.splice(index, 1);
-    });
-    
-    selectedCards = [];
-    renderMyCards();
-    document.getElementById('play-btn').disabled = true;
+    if (isSingleMode) {
+        // 单人模式
+        selectedCards.forEach(card => {
+            const index = myCards.findIndex(c => c.value === card.value && c.suit === card.suit);
+            if (index > -1) myCards.splice(index, 1);
+        });
+        
+        document.getElementById('last-play').classList.remove('hidden');
+        renderLastPlay(selectedCards, 2);
+        lastPlayPosition = 2;
+        
+        if (cardType.type === 'bomb') showEffect('炸弹', 'bomb');
+        else if (cardType.type === 'rocket') showEffect('火箭', 'rocket');
+        
+        if (myCards.length === 0) {
+            showEffect('你赢了！', 'spring');
+            setTimeout(() => location.reload(), 2000);
+            return;
+        }
+        
+        updateCardCount(2, myCards.length);
+        selectedCards = [];
+        renderMyCards();
+        document.getElementById('play-btn').disabled = true;
+        
+        currentTurn = 0;
+        setTimeout(aiPlay, 1500);
+    } else {
+        // 联机模式
+        socket.emit('play_cards', { room_id: roomId, cards: selectedCards });
+        
+        selectedCards.forEach(card => {
+            const index = myCards.findIndex(c => c.value === card.value && c.suit === card.suit);
+            if (index > -1) myCards.splice(index, 1);
+        });
+        
+        selectedCards = [];
+        renderMyCards();
+        document.getElementById('play-btn').disabled = true;
+    }
 });
 
 document.getElementById('pass-btn').addEventListener('click', () => {
-    socket.emit('pass', { room_id: roomId });
-    selectedCards = [];
-    renderMyCards();
-    document.getElementById('pass-btn').disabled = true;
+    if (isSingleMode) {
+        selectedCards = [];
+        renderMyCards();
+        document.getElementById('pass-btn').disabled = true;
+        document.getElementById('play-btn').disabled = true;
+        currentTurn = 0;
+        setTimeout(aiPlay, 1000);
+    } else {
+        socket.emit('pass', { room_id: roomId });
+        selectedCards = [];
+        renderMyCards();
+        document.getElementById('pass-btn').disabled = true;
+    }
 });
 
 // 渲染手牌
@@ -368,4 +414,156 @@ function showEffect(text, type) {
     setTimeout(() => {
         effect.remove();
     }, 2000);
+}
+
+
+// 单人模式
+function startSingleMode() {
+    document.getElementById('room-panel').style.display = 'none';
+    gameStarted = true;
+    myPosition = 2;
+    
+    // 初始化AI玩家
+    const seats = [
+        document.querySelector('#top-player .player-seat'),
+        document.querySelector('#left-player .player-seat')
+    ];
+    seats.forEach((seat, idx) => {
+        seat.classList.remove('empty');
+        seat.classList.add('ready');
+        seat.querySelector('.player-name').textContent = `AI${idx + 1}`;
+    });
+    
+    // 发牌
+    const deck = createDeck();
+    shuffleArray(deck);
+    
+    const bottomCards = deck.slice(0, 3);
+    aiCards.left = deck.slice(3, 20);
+    aiCards.top = deck.slice(20, 37);
+    myCards = deck.slice(37, 54);
+    
+    renderMyCards();
+    document.querySelector('.action-buttons').classList.remove('hidden');
+    
+    // 随机决定地主
+    const landlord = Math.floor(Math.random() * 3);
+    setTimeout(() => {
+        decideLandlord(landlord, bottomCards);
+    }, 1000);
+}
+
+function decideLandlord(position, bottomCards) {
+    document.getElementById('landlord-cards').classList.remove('hidden');
+    renderBottomCards(bottomCards);
+    
+    const seats = [
+        document.querySelector('#top-player .player-seat'),
+        document.querySelector('#left-player .player-seat'),
+        document.querySelector('#right-player .player-seat')
+    ];
+    
+    seats[position].classList.add('landlord');
+    const badge = document.createElement('div');
+    badge.className = 'landlord-badge';
+    badge.textContent = '地主';
+    seats[position].appendChild(badge);
+    
+    if (position === 2) {
+        isLandlord = true;
+        myCards = myCards.concat(bottomCards);
+        renderMyCards();
+        showEffect('你是地主', 'landlord');
+        currentTurn = 2;
+        enablePlay();
+    } else if (position === 1) {
+        aiCards.left = aiCards.left.concat(bottomCards);
+        showEffect('AI1是地主', 'landlord');
+        currentTurn = 1;
+        setTimeout(aiPlay, 1500);
+    } else {
+        aiCards.top = aiCards.top.concat(bottomCards);
+        showEffect('AI2是地主', 'landlord');
+        currentTurn = 0;
+        setTimeout(aiPlay, 1500);
+    }
+    
+    updateCardCount(0, aiCards.top.length);
+    updateCardCount(1, aiCards.left.length);
+    updateCardCount(2, myCards.length);
+}
+
+function aiPlay() {
+    if (!isSingleMode || currentTurn === 2) return;
+    
+    const aiCardSet = currentTurn === 1 ? aiCards.left : aiCards.top;
+    
+    // 简单AI：随机出牌
+    const playCards = selectAICards(aiCardSet);
+    
+    if (playCards.length > 0) {
+        playCards.forEach(card => {
+            const idx = aiCardSet.findIndex(c => c.value === card.value && c.suit === card.suit);
+            if (idx > -1) aiCardSet.splice(idx, 1);
+        });
+        
+        document.getElementById('last-play').classList.remove('hidden');
+        renderLastPlay(playCards, currentTurn);
+        lastPlayPosition = currentTurn;
+        
+        const cardType = analyzeCardType(playCards);
+        if (cardType.type === 'bomb') showEffect('炸弹', 'bomb');
+        else if (cardType.type === 'rocket') showEffect('火箭', 'rocket');
+        
+        if (aiCardSet.length === 0) {
+            setTimeout(() => {
+                showEffect('AI获胜', 'normal');
+                setTimeout(() => location.reload(), 2000);
+            }, 500);
+            return;
+        }
+    }
+    
+    updateCardCount(currentTurn, aiCardSet.length);
+    currentTurn = (currentTurn + 1) % 3;
+    
+    if (currentTurn === 2) {
+        enablePlay();
+    } else {
+        setTimeout(aiPlay, 1500);
+    }
+}
+
+function selectAICards(cards) {
+    // 简单策略：出最小的单张
+    if (cards.length === 0) return [];
+    
+    const sorted = cards.sort((a, b) => CARD_VALUES[a.value] - CARD_VALUES[b.value]);
+    return [sorted[0]];
+}
+
+function enablePlay() {
+    document.getElementById('play-btn').disabled = false;
+    document.getElementById('pass-btn').disabled = lastPlayPosition === 2 ? true : false;
+}
+
+function createDeck() {
+    const suits = ['♠', '♥', '♣', '♦'];
+    const values = ['3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A', '2'];
+    const deck = [];
+    for (const s of suits) {
+        for (const v of values) {
+            deck.push({ suit: s, value: v });
+        }
+    }
+    deck.push({ suit: '', value: 'joker' });
+    deck.push({ suit: '', value: 'JOKER' });
+    return deck;
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
 }
