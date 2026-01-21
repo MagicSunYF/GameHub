@@ -6,43 +6,73 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #1d1d1f 0%, #000 100%);
+    background: linear-gradient(135deg, #1d1d1f 0%, #000 100%) !important;
     color: #f5f5f7;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
     overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100vh;
 }
 
 #title {
     font-size: 2.5rem;
     font-weight: 600;
-    margin: 20px 0;
     text-align: center;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+#title.hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+    pointer-events: none;
 }
 
 #hint {
     color: #86868b;
     font-size: 0.9rem;
-    margin-bottom: 20px;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10;
+}
+
+#hint.hidden {
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
 }
 
 #game-container {
-    width: 100%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
     max-width: 1400px;
-    flex: 1;
+    height: 85vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.hidden {
-    display: none !important;
+#game-container.hidden {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+    pointer-events: none;
 }
 
 /* 游戏界面 */
@@ -158,6 +188,13 @@ body {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 20px;
     backdrop-filter: blur(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#room-panel.hidden {
+    opacity: 0;
+    transform: scale(0.9);
+    pointer-events: none;
 }
 
 .room-id-box {
@@ -177,6 +214,28 @@ body {
     font-weight: 700;
     color: #0a84ff;
     letter-spacing: 4px;
+}
+/* 底牌 */
+#landlord-cards {
+    text-align: center;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#landlord-cards.hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+}
+
+#landlord-cards .label {
+    color: #86868b;
+    margin-bottom: 10px;
+}
+
+#bottom-cards {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
 }
 
 .menu-buttons {
@@ -210,26 +269,13 @@ body {
     display: flex;
     gap: 10px;
     align-items: center;
+    transition: opacity 0.3s ease;
 }
 
-#room-id-input {
-    padding: 10px 20px;
-    font-size: 1.2rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    color: #f5f5f7;
-    text-align: center;
-    width: 200px;
-    letter-spacing: 2px;
+#join-input.hidden {
+    opacity: 0;
+    pointer-events: none;
 }
-
-#room-id-input:focus {
-    outline: none;
-    border-color: #0a84ff;
-}
-
-/* 底牌 */
     text-align: center;
 }
 
@@ -251,6 +297,13 @@ body {
     gap: 20px;
 }
 
+.bid-info {
+    font-size: 1.2rem;
+    color: #ff9500;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
 .bid-buttons {
     display: flex;
     gap: 15px;
@@ -259,22 +312,62 @@ body {
 .bid-btn {
     padding: 12px 30px;
     font-size: 1rem;
-    background: rgba(255, 149, 0, 0.2);
-    border: 2px solid #ff9500;
     border-radius: 10px;
-    color: #ff9500;
     cursor: pointer;
     transition: all 0.3s;
     font-weight: 600;
+    border: 2px solid;
+}
+
+.bid-btn.pass {
+    background: rgba(142, 142, 147, 0.2);
+    border-color: #8e8e93;
+    color: #8e8e93;
+}
+
+.bid-btn.call {
+    background: rgba(255, 149, 0, 0.2);
+    border-color: #ff9500;
+    color: #ff9500;
+}
+
+.bid-btn.grab {
+    background: rgba(255, 59, 48, 0.2);
+    border-color: #ff3b30;
+    color: #ff3b30;
 }
 
 .bid-btn:hover {
-    background: rgba(255, 149, 0, 0.4);
     transform: scale(1.05);
+}
+
+.bid-btn.pass:hover {
+    background: rgba(142, 142, 147, 0.3);
+}
+
+.bid-btn.call:hover {
+    background: rgba(255, 149, 0, 0.4);
+}
+
+.bid-btn.grab:hover {
+    background: rgba(255, 59, 48, 0.4);
+}
+
+.bid-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
 }
 
 #last-play {
     text-align: center;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#last-play.hidden {
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
 }
 
 #last-play .label {
@@ -298,7 +391,7 @@ body {
 
 #hand-cards {
     display: flex;
-    gap: 5px;
+    gap: 8px;
     justify-content: center;
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -306,38 +399,85 @@ body {
 }
 
 .card {
-    width: 50px;
-    height: 70px;
-    min-width: 50px;
-    background: white;
-    border-radius: 6px;
+    width: 65px;
+    height: 90px;
+    min-width: 65px;
+    background: radial-gradient(circle at 30% 30%, #ffffff, #f5f5f5);
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 8px 6px;
     cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.3),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.1),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.8);
     position: relative;
     user-select: none;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.6) 0%, transparent 50%);
+    pointer-events: none;
 }
 
 .card:hover {
-    transform: translateY(-8px);
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.4),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.15),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.9);
 }
 
 .card.selected {
-    transform: translateY(-15px);
-    box-shadow: 0 6px 16px rgba(10, 132, 255, 0.5);
+    transform: translateY(-20px) scale(1.05);
+    box-shadow: 
+        0 12px 32px rgba(10, 132, 255, 0.5),
+        inset -2px -2px 4px rgba(10, 132, 255, 0.2),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+        0 0 0 2px rgba(10, 132, 255, 0.6);
 }
 
 .card-value {
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .card-suit {
-    font-size: 0.9rem;
+    font-size: 1.3rem;
+    line-height: 1;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+}
+
+.card-corner {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.card-corner.top-left {
+    top: 6px;
+    left: 6px;
+}
+
+.card-corner.bottom-right {
+    bottom: 6px;
+    right: 6px;
+    transform: rotate(180deg);
 }
 
 .card.red {
@@ -349,19 +489,44 @@ body {
 }
 
 .card.joker {
-    background: linear-gradient(135deg, #ff9500, #ff3b30);
+    background: radial-gradient(circle at 30% 30%, #ff9500, #ff6b00);
     color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 
+        0 4px 12px rgba(255, 149, 0, 0.5),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.2),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+.card.joker::before {
+    background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%);
 }
 
 .card.big-joker {
-    background: linear-gradient(135deg, #000, #1d1d1f);
+    background: radial-gradient(circle at 30% 30%, #2a2a2a, #000);
     color: #ff3b30;
+    border: 1px solid rgba(255, 59, 48, 0.3);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.8),
+        inset -2px -2px 4px rgba(255, 59, 48, 0.2),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+.card.big-joker::before {
+    background: linear-gradient(135deg, rgba(255,59,48,0.3) 0%, transparent 50%);
 }
 
 .action-buttons {
     display: flex;
     gap: 20px;
     justify-content: center;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.action-buttons.hidden {
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
 }
 
 .action-btn {
@@ -486,15 +651,47 @@ body {
 }
 
 /* 响应式 */
+@media (max-width: 1400px) {
+    .card {
+        width: 58px;
+        height: 82px;
+        min-width: 58px;
+    }
+    
+    .card-value {
+        font-size: 1.3rem;
+    }
+    
+    .card-suit {
+        font-size: 1.1rem;
+    }
+}
+
 @media (max-width: 1200px) {
     #game-screen {
         grid-template-columns: 150px 1fr 150px;
     }
     
     .card {
-        width: 45px;
-        height: 65px;
-        min-width: 45px;
+        width: 52px;
+        height: 74px;
+        min-width: 52px;
+    }
+    
+    .card-value {
+        font-size: 1.2rem;
+    }
+    
+    .card-suit {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .card {
+        width: 46px;
+        height: 66px;
+        min-width: 46px;
     }
     
     .card-value {
@@ -502,22 +699,6 @@ body {
     }
     
     .card-suit {
-        font-size: 0.8rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .card {
-        width: 40px;
-        height: 58px;
-        min-width: 40px;
-    }
-    
-    .card-value {
         font-size: 0.9rem;
-    }
-    
-    .card-suit {
-        font-size: 0.7rem;
     }
 }
