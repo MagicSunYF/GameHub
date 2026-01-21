@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>斗地主</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        html, body {
+            background: linear-gradient(135deg, #1d1d1f 0%, #000 100%) !important;
+            background-attachment: fixed !important;
+        }
+    </style>
 </head>
 <body>
     <h1 id="title">🃏 斗地主</h1>
@@ -47,10 +53,11 @@
                 
                 <!-- 叫地主区 -->
                 <div id="bid-area" class="hidden">
+                    <div class="bid-info">当前倍数: <span id="bid-multiplier">1</span>倍</div>
                     <div class="bid-buttons">
-                        <button class="bid-btn" data-bid="0">不叫</button>
-                        <button class="bid-btn" data-bid="1">叫地主</button>
-                        <button class="bid-btn" data-bid="2">抢地主</button>
+                        <button class="bid-btn pass" data-bid="0">不叫/不抢</button>
+                        <button class="bid-btn call" data-bid="1">叫地主</button>
+                        <button class="bid-btn grab" data-bid="2">抢地主</button>
                     </div>
                 </div>
 

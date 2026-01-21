@@ -4,6 +4,7 @@ from game_manager import GameManager
 from config import Config
 from plugins.gomoku import GomokuPlugin
 from plugins.landlord import LandlordPlugin
+from plugins.racing import RacingPlugin
 
 def main():
     # 创建应用
@@ -24,6 +25,7 @@ def main():
     if db:
         GomokuPlugin(app, socketio, db, game_manager)
     LandlordPlugin(app, socketio, db, game_manager)
+    RacingPlugin(app, socketio, db, game_manager)
     
     # 启动服务器
     print(f'服务器启动: http://{Config.HOST}:{Config.PORT}')

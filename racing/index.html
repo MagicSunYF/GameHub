@@ -7,20 +7,45 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1 id="title">极速狂飙</h1>
-    <div id="game-container">
-        <canvas id="gameCanvas"></canvas>
-        <div id="score">得分: 0</div>
-        <div id="game-over" class="hidden">
-            <div class="game-over-title">游戏结束</div>
-            <div class="game-over-score">得分: <span id="final-score">0</span></div>
-            <button onclick="restartGame()">重新开始</button>
+    <h1 id="title">🏎️ 极速狂飙</h1>
+    <div id="hint">按 ESC 隐藏</div>
+    
+    <div id="menu-screen">
+        <div id="menu-panel">
+            <button id="single-mode-btn" class="menu-btn">单人模式</button>
+            <button id="ai-mode-btn" class="menu-btn">人机对战</button>
+            <button id="create-room-btn" class="menu-btn">创建房间</button>
+            <button id="join-room-btn" class="menu-btn">加入房间</button>
+        </div>
+        <div id="join-input" class="hidden">
+            <input type="text" id="room-id-input" placeholder="输入房间号" maxlength="8">
+            <button id="join-confirm-btn" class="menu-btn small">加入</button>
+            <button id="spectate-btn" class="menu-btn small">观战</button>
+        </div>
+        <div id="room-info" class="hidden">
+            <p>房间号: <span id="room-id-display"></span></p>
+            <p id="waiting-text">等待对手加入...</p>
         </div>
     </div>
-    <div id="controls">
-        <button onclick="startGame()">开始游戏</button>
+    
+    <div id="game-container" class="hidden">
+        <div id="score">得分: 0</div>
+        <div id="opponent-score" class="hidden">对手: 0</div>
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="game-over" class="hidden">
+            <h2>游戏结束</h2>
+            <p>最终得分: <span id="final-score">0</span></p>
+            <p id="result-text"></p>
+            <button onclick="backToMenu()">返回菜单</button>
+        </div>
     </div>
-    <div id="hint">按 ESC 隐藏 | ← → 移动 | 空格 跳跃</div>
-    <script src="game.js"></script>
+    
+    <div id="controls" class="hidden">
+        <p>← → 切换车道 | 空格 跳跃</p>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="racing.js"></script>
 </body>
 </html>
