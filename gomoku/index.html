@@ -4,17 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>五子棋联机对战</title>
+    <link rel="stylesheet" href="/shared-styles.css">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/heartbeat.js"></script>
 </head>
 <body>
     <h1 id="title">五子棋联机对战</h1>
     
     <div id="menu-panel">
-        <button onclick="startSinglePlayer()">单人模式</button>
+        <button onclick="showDifficultyMenu()">单人模式</button>
         <button onclick="createRoom()">创建房间</button>
         <button onclick="joinRoom()">加入房间</button>
         <button onclick="spectateRoom()">观战</button>
+    </div>
+    
+    <div id="difficulty-panel" class="hidden">
+        <h2>选择难度</h2>
+        <button onclick="selectDifficulty('easy')">简单</button>
+        <button onclick="selectDifficulty('medium')">中等</button>
+        <button onclick="selectDifficulty('hard')">困难</button>
+        <button onclick="document.getElementById('difficulty-panel').classList.add('hidden'); document.getElementById('menu-panel').classList.remove('hidden');">返回</button>
     </div>
     
     <div id="game-board"></div>
