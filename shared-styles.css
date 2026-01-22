@@ -1,0 +1,474 @@
+/**
+ * 共享CSS变量 - 小游戏集平台
+ * 
+ * 统一的设计系统变量，遵循Apple设计语言
+ * 所有游戏应使用这些变量以保持一致的视觉风格
+ */
+
+:root {
+    /* ========== 颜色变量 ========== */
+    
+    /* 背景颜色 */
+    --bg-primary: linear-gradient(135deg, #1d1d1f 0%, #000 100%);
+    --bg-dark-start: #1d1d1f;
+    --bg-dark-end: #000;
+    --bg-overlay: rgba(0, 0, 0, 0.85);
+    --bg-glass: rgba(255, 255, 255, 0.05);
+    --bg-glass-hover: rgba(255, 255, 255, 0.08);
+    --bg-glass-active: rgba(255, 255, 255, 0.1);
+    
+    /* 文字颜色 */
+    --text-primary: #f5f5f7;
+    --text-secondary: #86868b;
+    --text-gradient: linear-gradient(90deg, #f5f5f7, #86868b);
+    
+    /* 边框颜色 */
+    --border-light: rgba(255, 255, 255, 0.1);
+    --border-medium: rgba(255, 255, 255, 0.2);
+    --border-strong: rgba(255, 255, 255, 0.3);
+    
+    /* 强调色 */
+    --accent-blue: #0a84ff;
+    --accent-blue-light: rgba(10, 132, 255, 0.2);
+    --accent-blue-medium: rgba(10, 132, 255, 0.4);
+    --accent-blue-strong: rgba(10, 132, 255, 0.6);
+    
+    --accent-green: #30d158;
+    --accent-green-light: rgba(48, 209, 88, 0.1);
+    --accent-green-medium: rgba(48, 209, 88, 0.5);
+    
+    --accent-orange: #ff9500;
+    --accent-orange-light: rgba(255, 149, 0, 0.15);
+    --accent-orange-medium: rgba(255, 149, 0, 0.4);
+    --accent-orange-strong: rgba(255, 149, 0, 0.8);
+    
+    --accent-red: #ff3b30;
+    --accent-red-light: rgba(255, 59, 48, 0.1);
+    --accent-red-medium: rgba(255, 59, 48, 0.4);
+    --accent-red-strong: rgba(255, 59, 48, 0.6);
+    
+    --accent-gold: #FFD700;
+    --accent-gold-gradient: linear-gradient(45deg, #FFD700, #FFA500, #FF6347);
+    
+    /* 阴影 */
+    --shadow-small: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-large: 0 20px 40px rgba(0, 0, 0, 0.3);
+    --shadow-xlarge: 0 20px 60px rgba(0, 0, 0, 0.5);
+    --shadow-inset-light: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    --shadow-inset-dark: inset -2px -2px 4px rgba(0, 0, 0, 0.1);
+    
+    /* ========== 字体变量 ========== */
+    
+    /* 字体家族 */
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-family-chinese: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    
+    /* 字体大小 */
+    --font-size-xs: clamp(12px, 1.5vw, 14px);
+    --font-size-sm: clamp(14px, 1.8vw, 16px);
+    --font-size-base: clamp(15px, 2vw, 17px);
+    --font-size-md: clamp(15px, 2vw, 18px);
+    --font-size-lg: clamp(20px, 3vw, 28px);
+    --font-size-xl: clamp(24px, 4vw, 32px);
+    --font-size-2xl: clamp(32px, 5vw, 48px);
+    --font-size-3xl: clamp(32px, 5vw, 56px);
+    --font-size-4xl: clamp(48px, 6vw, 72px);
+    --font-size-5xl: clamp(60px, 8vw, 96px);
+    
+    /* 字体粗细 */
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    --font-weight-black: 900;
+    
+    /* 字间距 */
+    --letter-spacing-tight: -2px;
+    --letter-spacing-normal: -1px;
+    --letter-spacing-wide: 2px;
+    --letter-spacing-wider: 4px;
+    
+    /* 行高 */
+    --line-height-tight: 1;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.6;
+    
+    /* ========== 间距变量 ========== */
+    
+    --spacing-xs: clamp(10px, 1.5vh, 12px);
+    --spacing-sm: clamp(10px, 2vh, 15px);
+    --spacing-md: clamp(15px, 2vh, 20px);
+    --spacing-lg: clamp(20px, 3vh, 30px);
+    --spacing-xl: clamp(30px, 4vh, 40px);
+    --spacing-2xl: clamp(40px, 5vh, 50px);
+    
+    /* ========== 圆角变量 ========== */
+    
+    --radius-sm: 8px;
+    --radius-md: 10px;
+    --radius-lg: clamp(12px, 2vw, 16px);
+    --radius-xl: clamp(12px, 2vw, 20px);
+    --radius-2xl: 18px;
+    --radius-full: 980px;
+    --radius-circle: 50%;
+    
+    /* ========== 动画变量 ========== */
+    
+    /* 动画时长 */
+    --duration-fast: 0.2s;
+    --duration-normal: 0.3s;
+    --duration-slow: 0.5s;
+    --duration-slower: 0.8s;
+    --duration-slowest: 1s;
+    --duration-extra-slow: 1.5s;
+    --duration-ultra-slow: 2s;
+    --duration-super-slow: 3s;
+    
+    /* 缓动函数 */
+    --ease-default: ease;
+    --ease-in: ease-in;
+    --ease-out: ease-out;
+    --ease-in-out: ease-in-out;
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-spring: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    
+    /* 过渡效果 */
+    --transition-fast: all 0.2s ease;
+    --transition-normal: all 0.3s ease;
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-opacity: opacity 0.3s ease;
+    --transition-transform: transform 0.3s ease;
+    
+    /* ========== 布局变量 ========== */
+    
+    /* Z-index层级 */
+    --z-base: 1;
+    --z-dropdown: 10;
+    --z-sticky: 100;
+    --z-overlay: 1000;
+    --z-modal: 2000;
+    --z-tooltip: 3000;
+    
+    /* 模糊效果 */
+    --blur-sm: blur(5px);
+    --blur-md: blur(10px);
+    --blur-lg: blur(20px);
+    
+    /* 透明度 */
+    --opacity-disabled: 0.3;
+    --opacity-hover: 0.8;
+    --opacity-hidden: 0;
+    --opacity-visible: 1;
+}
+
+/* ========== 通用工具类 ========== */
+
+/* 隐藏状态 */
+.hidden {
+    opacity: var(--opacity-hidden) !important;
+    pointer-events: none !important;
+    transition: opacity var(--duration-normal) var(--ease-smooth) !important;
+}
+
+/* 毛玻璃效果 */
+.glass {
+    background: var(--bg-glass);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+}
+
+.glass-hover:hover {
+    background: var(--bg-glass-hover);
+}
+
+/* 渐变文字 */
+.text-gradient {
+    background: var(--text-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* 平滑过渡 */
+.transition-smooth {
+    transition: var(--transition-smooth);
+}
+
+/* ========== 通用按钮样式 ========== */
+
+.btn {
+    padding: var(--spacing-xs) var(--spacing-lg);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    font-family: var(--font-family);
+    cursor: pointer;
+    background: var(--bg-glass);
+    color: var(--text-primary);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    transition: var(--transition-smooth);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+    white-space: nowrap;
+}
+
+.btn:hover {
+    background: var(--bg-glass-hover);
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn:disabled {
+    opacity: var(--opacity-disabled);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-primary {
+    background: var(--accent-blue-light);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+
+.btn-primary:hover {
+    background: var(--accent-blue-medium);
+}
+
+.btn-success {
+    background: var(--accent-green-light);
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+}
+
+.btn-success:hover {
+    background: var(--accent-green-medium);
+}
+
+.btn-warning {
+    background: var(--accent-orange-light);
+    border-color: var(--accent-orange);
+    color: var(--accent-orange);
+}
+
+.btn-warning:hover {
+    background: var(--accent-orange-medium);
+}
+
+.btn-danger {
+    background: var(--accent-red-light);
+    border-color: var(--accent-red);
+    color: var(--accent-red);
+}
+
+.btn-danger:hover {
+    background: var(--accent-red-medium);
+}
+
+/* ========== 通用卡片样式 ========== */
+
+.card {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    transition: var(--transition-smooth);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+}
+
+.card:hover {
+    background: var(--bg-glass-hover);
+    border-color: var(--border-medium);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-large);
+}
+
+/* ========== 通用动画 ========== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes scaleOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translate(0, 0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translate(-2px, -2px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translate(2px, 2px);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0.5);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+/* ========== 弹幕样式 ========== */
+
+.barrage {
+    position: fixed;
+    right: -100%;
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: var(--bg-glass);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-full);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+    box-shadow: var(--shadow-medium);
+    animation: slideInRight 0.5s var(--ease-smooth) forwards,
+               slideOutRight 0.5s var(--ease-smooth) 4.5s forwards;
+    z-index: var(--z-overlay);
+    pointer-events: none;
+}
+
+@keyframes slideInRight {
+    from {
+        right: -100%;
+    }
+    to {
+        right: 20px;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        right: 20px;
+    }
+    to {
+        right: -100%;
+    }
+}
+
+/* ========== 响应式断点提示 ========== */
+
+/*
+ * 建议的响应式断点:
+ * - 移动设备: max-width: 480px
+ * - 平板设备: max-width: 768px
+ * - 小型桌面: max-width: 1024px
+ * - 中型桌面: max-width: 1200px
+ * - 大型桌面: max-width: 1400px
+ */

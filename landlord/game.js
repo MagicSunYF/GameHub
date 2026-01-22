@@ -1,4 +1,71 @@
-const socket = io('http://localhost:5000');
+const socket = io(window.location.origin);
+
+// 连接状态更新函数
+function updateConnectionStatus(status, attempts) {
+    if (status === 'connected') {
+        console.log('已连接到服务器');
+    } else if (status === 'reconnecting') {
+        console.log(`正在重连... (尝试 ${attempts})`);
+    } else if (status === 'disconnected') {
+        console.log('连接已断开');
+    }
+}
+
+// 初始化心跳管理器
+const heartbeat = new HeartbeatManager(socket, {
+    pingInterval: 30000,
+    pongTimeout: 5000,
+    maxReconnectAttempts: 3,
+    onConnectionChange: (status, attempts) => {
+        updateConnectionStatus(status, attempts);
+    },
+    stateRecovery: {
+        save: () => {
+            return {
+                roomId,
+                myPosition,
+                myCards: [...myCards],
+                selectedCards: [...selectedCards],
+                isLandlord,
+                currentTurn,
+                gameStarted,
+                isSingleMode,
+                lastPlayPosition,
+                lastPlayCards: [...lastPlayCards],
+                bidMultiplier,
+                passCount,
+                bombCount
+            };
+        },
+        restore: (state) => {
+            if (!state) return;
+            
+            roomId = state.roomId;
+            myPosition = state.myPosition;
+            myCards = [...state.myCards];
+            selectedCards = [...state.selectedCards];
+            isLandlord = state.isLandlord;
+            currentTurn = state.currentTurn;
+            gameStarted = state.gameStarted;
+            isSingleMode = state.isSingleMode;
+            lastPlayPosition = state.lastPlayPosition;
+            lastPlayCards = [...state.lastPlayCards];
+            bidMultiplier = state.bidMultiplier;
+            passCount = state.passCount;
+            bombCount = state.bombCount;
+            
+            if (roomId && !isSingleMode) {
+                socket.emit('rejoin_room', { room_id: roomId });
+            }
+            
+            if (gameStarted) {
+                document.getElementById('menu-screen').classList.add('hidden');
+                document.getElementById('room-panel').classList.add('hidden');
+                renderMyCards();
+            }
+        }
+    }
+});
 
 let roomId = null;
 let myPosition = null;
@@ -125,6 +192,9 @@ socket.on('landlord_decided', (data) => {
     document.getElementById('landlord-cards').classList.remove('hidden');
     renderBottomCards(data.bottom_cards);
     
+    bidMultiplier = data.bid_multiplier || 1;
+    document.getElementById('bid-multiplier').textContent = bidMultiplier;
+    
     const seats = [
         document.querySelector('#top-player .player-seat'),
         document.querySelector('#left-player .player-seat'),
@@ -139,17 +209,33 @@ socket.on('landlord_decided', (data) => {
     
     if (data.landlord === myPosition) {
         isLandlord = true;
-        myCards = myCards.concat(data.bottom_cards);
-        renderMyCards();
-        showEffect('地主', 'landlord');
+        showEffect('你是地主', 'landlord');
     }
+});
+
+socket.on('update_cards', (data) => {
+    myCards = data.cards;
+    renderMyCards();
+});
+
+socket.on('player_bid', (data) => {
+    showEffect(`玩家${data.position + 1}叫${data.bid}分`, 'normal');
+});
+
+socket.on('no_landlord', () => {
+    showEffect('无人叫地主，重新开始', 'normal');
+    setTimeout(() => location.reload(), 2000);
+});
+
+socket.on('player_passed', (data) => {
+    showEffect(`玩家${data.position + 1}不出`, 'normal');
 });
 
 socket.on('play_turn', (data) => {
     currentTurn = data.position;
     if (data.position === myPosition) {
         document.getElementById('play-btn').disabled = false;
-        document.getElementById('pass-btn').disabled = data.can_pass ? false : true;
+        document.getElementById('pass-btn').disabled = data.can_pass === false;
     }
 });
 
@@ -171,7 +257,9 @@ socket.on('cards_played', (data) => {
 
 socket.on('game_over', (data) => {
     const winner = data.winner === myPosition ? '你赢了！' : '你输了！';
-    showEffect(winner, data.spring ? 'spring' : 'normal');
+    const multiplier = data.multiplier || 1;
+    const msg = data.spring ? `${winner} (春天 ${multiplier}倍)` : `${winner} (${multiplier}倍)`;
+    showEffect(msg, data.spring ? 'spring' : 'normal');
     
     setTimeout(() => {
         location.reload();
@@ -187,44 +275,63 @@ document.querySelectorAll('.bid-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const bid = parseInt(btn.dataset.bid);
         
-        if (bid === 0) {
-            // 不叫/不抢
-            passCount++;
-            if (currentBidder === null) {
-                // 第一轮叫地主，没人叫则下一位
-                nextBidTurn();
+        if (isSingleMode) {
+            handleSingleModeBid(bid);
+        } else {
+            // 联机模式直接发送叫牌
+            socket.emit('bid', { room_id: roomId, bid: bid });
+            document.getElementById('bid-area').classList.add('hidden');
+        }
+    });
+});
+
+function handleSingleModeBid(bid) {
+    if (bid === 0) {
+        // 不叫/不抢
+        passCount++;
+        if (currentBidder === null) {
+            // 第一轮叫地主，没人叫则下一位
+            nextBidTurn();
+        } else {
+            // 抢地主阶段
+            if (passCount >= 2) {
+                // 连续两人不抢，确定地主
+                finalizeLandlord();
             } else {
-                // 抢地主阶段
-                if (passCount >= 2) {
-                    // 连续两人不抢，确定地主
-                    finalizeLandlord();
-                } else {
-                    nextBidTurn();
-                }
-            }
-        } else if (bid === 1) {
-            // 叫地主
-            if (currentBidder === null) {
-                currentBidder = myPosition;
-                bidMultiplier = 2;
-                passCount = 0;
-                document.getElementById('bid-multiplier').textContent = bidMultiplier;
-                nextBidTurn();
-            }
-        } else if (bid === 2) {
-            // 抢地主
-            if (currentBidder !== null) {
-                currentBidder = myPosition;
-                bidMultiplier = Math.min(bidMultiplier + 1, 5);
-                passCount = 0;
-                document.getElementById('bid-multiplier').textContent = bidMultiplier;
                 nextBidTurn();
             }
         }
-        
-        document.getElementById('bid-area').classList.add('hidden');
-    });
-});
+    } else if (bid === 1) {
+        // 叫地主
+        if (currentBidder === null) {
+            currentBidder = myPosition;
+            bidMultiplier = 2;
+            passCount = 0;
+            document.getElementById('bid-multiplier').textContent = bidMultiplier;
+            nextBidTurn();
+        }
+    } else if (bid === 2) {
+        // 抢地主
+        if (currentBidder !== null) {
+            currentBidder = myPosition;
+            bidMultiplier = Math.min(bidMultiplier + 1, 5);
+            passCount = 0;
+            document.getElementById('bid-multiplier').textContent = bidMultiplier;
+            nextBidTurn();
+        }
+    } else if (bid === 3) {
+        // 加倍
+        if (currentBidder !== null) {
+            currentBidder = myPosition;
+            bidMultiplier = Math.min(bidMultiplier * 2, 8);
+            passCount = 0;
+            document.getElementById('bid-multiplier').textContent = bidMultiplier;
+            nextBidTurn();
+        }
+    }
+    
+    document.getElementById('bid-area').classList.add('hidden');
+}
 
 function nextBidTurn() {
     currentTurn = (currentTurn + 1) % 3;
@@ -267,14 +374,22 @@ function aiBid() {
             bidMultiplier = 2;
             passCount = 0;
             document.getElementById('bid-multiplier').textContent = bidMultiplier;
-            showEffect(`AI${currentTurn + 1}叫地主`, 'normal');
+            showEffect(`AI${currentTurn + 1}叫1分`, 'normal');
         } else {
             passCount++;
             showEffect(`AI${currentTurn + 1}不叫`, 'normal');
         }
     } else {
-        // AI抢地主概率30%
-        if (random > 0.7 && bidMultiplier < 5) {
+        // AI抢地主概率30%，加倍概率10%
+        if (random > 0.9 && bidMultiplier < 8) {
+            // 加倍
+            currentBidder = currentTurn;
+            bidMultiplier = Math.min(bidMultiplier * 2, 8);
+            passCount = 0;
+            document.getElementById('bid-multiplier').textContent = bidMultiplier;
+            showEffect(`AI${currentTurn + 1}加倍`, 'normal');
+        } else if (random > 0.7 && bidMultiplier < 5) {
+            // 抢地主
             currentBidder = currentTurn;
             bidMultiplier++;
             passCount = 0;
@@ -498,57 +613,109 @@ function analyzeCardType(cards) {
     const values = cards.map(c => CARD_VALUES[c.value]).sort((a, b) => a - b);
     const counts = {};
     values.forEach(v => counts[v] = (counts[v] || 0) + 1);
+    const uniqueValues = Object.keys(counts).map(Number).sort((a, b) => a - b);
     const countArr = Object.values(counts).sort((a, b) => b - a);
     
-    // 火箭
+    // 火箭 (Rocket): 小王+大王
     if (cards.length === 2 && values[0] === 16 && values[1] === 17) {
-        return { valid: true, type: 'rocket' };
+        return { valid: true, type: 'rocket', value: 17 };
     }
     
-    // 炸弹
+    // 炸弹 (Bomb): 四张相同
     if (cards.length === 4 && countArr[0] === 4) {
-        return { valid: true, type: 'bomb' };
+        return { valid: true, type: 'bomb', value: uniqueValues[0] };
     }
     
-    // 单张
+    // 单张 (Single)
     if (cards.length === 1) {
-        return { valid: true, type: 'single' };
+        return { valid: true, type: 'single', value: values[0] };
     }
     
-    // 对子
+    // 对子 (Pair)
     if (cards.length === 2 && countArr[0] === 2) {
-        return { valid: true, type: 'pair' };
+        return { valid: true, type: 'pair', value: uniqueValues[0] };
     }
     
-    // 三张
+    // 三张 (Triple)
     if (cards.length === 3 && countArr[0] === 3) {
-        return { valid: true, type: 'triple' };
+        return { valid: true, type: 'triple', value: uniqueValues[0] };
     }
     
-    // 三带一
+    // 三带一 (Triple with Single)
     if (cards.length === 4 && countArr[0] === 3 && countArr[1] === 1) {
-        return { valid: true, type: 'triple_single' };
+        const tripleValue = uniqueValues.find(v => counts[v] === 3);
+        return { valid: true, type: 'triple_single', value: tripleValue };
     }
     
-    // 三带一对
+    // 三带一对 (Triple with Pair)
     if (cards.length === 5 && countArr[0] === 3 && countArr[1] === 2) {
-        return { valid: true, type: 'triple_pair' };
+        const tripleValue = uniqueValues.find(v => counts[v] === 3);
+        return { valid: true, type: 'triple_pair', value: tripleValue };
     }
     
-    // 飞机（两个三张）
-    if (cards.length >= 6 && countArr[0] === 3 && countArr[1] === 3) {
-        return { valid: true, type: 'plane' };
+    // 顺子 (Straight): 至少5张连续单牌，不能包含2和王
+    if (cards.length >= 5 && countArr[0] === 1) {
+        const maxValue = Math.max(...uniqueValues);
+        // 顺子不能包含2(15)和王(16,17)
+        if (maxValue <= 14 && isSequence(uniqueValues)) {
+            return { valid: true, type: 'straight', value: uniqueValues[0], length: cards.length };
+        }
     }
     
-    // 顺子
-    if (cards.length >= 5 && countArr[0] === 1 && isSequence(values)) {
-        return { valid: true, type: 'straight' };
+    // 连对 (Consecutive Pairs): 至少3对连续对子
+    if (cards.length >= 6 && cards.length % 2 === 0) {
+        const pairCount = cards.length / 2;
+        if (pairCount >= 3 && countArr[0] === 2 && uniqueValues.length === pairCount) {
+            const maxValue = Math.max(...uniqueValues);
+            // 连对不能包含2(15)和王(16,17)
+            if (maxValue <= 14 && isSequence(uniqueValues)) {
+                return { valid: true, type: 'consecutive_pairs', value: uniqueValues[0], length: pairCount };
+            }
+        }
+    }
+    
+    // 飞机 (Plane): 至少2个连续三张
+    if (cards.length >= 6) {
+        const tripleValues = uniqueValues.filter(v => counts[v] === 3);
+        if (tripleValues.length >= 2 && isSequence(tripleValues)) {
+            const maxValue = Math.max(...tripleValues);
+            // 飞机不能包含2(15)和王(16,17)
+            if (maxValue <= 14) {
+                // 纯飞机（只有三张）
+                if (cards.length === tripleValues.length * 3) {
+                    return { valid: true, type: 'plane', value: tripleValues[0], length: tripleValues.length };
+                }
+                // 飞机带单牌
+                if (cards.length === tripleValues.length * 4 && uniqueValues.length === tripleValues.length * 2) {
+                    return { valid: true, type: 'plane_single', value: tripleValues[0], length: tripleValues.length };
+                }
+                // 飞机带对子
+                if (cards.length === tripleValues.length * 5) {
+                    const pairValues = uniqueValues.filter(v => counts[v] === 2);
+                    if (pairValues.length === tripleValues.length) {
+                        return { valid: true, type: 'plane_pair', value: tripleValues[0], length: tripleValues.length };
+                    }
+                }
+            }
+        }
+    }
+    
+    // 四带二 (Four with Two): 四张+两张单牌或两对
+    if (cards.length === 6 && countArr[0] === 4) {
+        const quadValue = uniqueValues.find(v => counts[v] === 4);
+        return { valid: true, type: 'four_two_single', value: quadValue };
+    }
+    
+    if (cards.length === 8 && countArr[0] === 4 && countArr[1] === 2 && countArr[2] === 2) {
+        const quadValue = uniqueValues.find(v => counts[v] === 4);
+        return { valid: true, type: 'four_two_pair', value: quadValue };
     }
     
     return { valid: false };
 }
 
 function isSequence(values) {
+    if (values.length < 2) return false;
     for (let i = 1; i < values.length; i++) {
         if (values[i] !== values[i-1] + 1) return false;
     }
@@ -572,6 +739,7 @@ function showEffect(text, type) {
 // 单人模式
 function startSingleMode() {
     document.getElementById('room-panel').style.display = 'none';
+    document.getElementById('bid-area').classList.add('hidden');
     gameStarted = true;
     myPosition = 2;
     
@@ -794,28 +962,35 @@ function canBeat(myCards, lastCards) {
     
     if (!myType.valid) return false;
     
-    // 火箭最大
+    // 火箭最大，可以压任何牌
     if (myType.type === 'rocket') return true;
     
     // 炸弹可以压任何非炸弹和火箭
     if (myType.type === 'bomb') {
         if (lastType.type === 'rocket') return false;
         if (lastType.type === 'bomb') {
-            return getCardValue(myCards[0]) > getCardValue(lastCards[0]);
+            return myType.value > lastType.value;
         }
         return true;
     }
     
-    // 其他牌型必须类型相同且数量相同
-    if (myType.type !== lastType.type || myCards.length !== lastCards.length) {
+    // 如果上家是炸弹或火箭，只能用更大的炸弹或火箭压
+    if (lastType.type === 'bomb' || lastType.type === 'rocket') {
         return false;
     }
     
-    // 比较牌力
-    const myValue = getCardValue(myCards[0]);
-    const lastValue = getCardValue(lastCards[0]);
+    // 其他牌型必须类型相同
+    if (myType.type !== lastType.type) {
+        return false;
+    }
     
-    return myValue > lastValue;
+    // 对于有长度的牌型（顺子、连对、飞机），长度必须相同
+    if (myType.length !== undefined && myType.length !== lastType.length) {
+        return false;
+    }
+    
+    // 比较牌力（使用value字段）
+    return myType.value > lastType.value;
 }
 
 function getCardValue(card) {
